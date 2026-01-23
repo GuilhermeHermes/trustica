@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/GuilhermeHermes/trustica/internal/adapter/inbound/cli"
 )
 
 func main() {
-	fmt.Println("trustica - certificate trust orchestration")
-	os.Exit(0)
+	if err := cli.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

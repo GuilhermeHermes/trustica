@@ -67,36 +67,17 @@ clean:
 all: fmt vet lint test build
 
 # =============================================================================
-# Integration Tests (Docker-based)
+# Integration Tests (delegated to test/testcontainer/Makefile)
 # =============================================================================
 
-## integration-certs: Generate test certificates
-integration-certs:
-	@echo "Generating test certificates..."
-	@chmod +x testcontainer/generate_certs.sh
-	@./testcontainer/generate_certs.sh
+## integration-test: Run integration tests (delegates to test/testcontainer)
+integration-test: build
+	@$(MAKE) -C test/testcontainer test
 
-## integration-build: Build test containers
-integration-build: build integration-certs
-	@echo "Building test containers..."
-	@COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f testcontainer/docker-compose.yml build
+## integration-shell: Start integration test shell (for debugging)
+integration-shell: build
+	@$(MAKE) -C test/testcontainer shell
 
-## integration-test: Run full integration test suite
-integration-test: integration-build
-	@echo "Running integration tests..."
-	@docker compose -f testcontainer/docker-compose.yml up --abort-on-container-exit --exit-code-from testrunner
-	@docker compose -f testcontainer/docker-compose.yml down
-
-## integration-shell: Start a shell in the test container (for debugging)
-integration-shell: integration-build
-	@docker compose -f testcontainer/docker-compose.yml run --rm testrunner /bin/bash
-
-## integration-server: Start just the test server (for local testing)
-integration-server: integration-certs
-	@echo "Starting test server on https://localhost:8443..."
-	@cd testcontainer/testserver && TLS_CERT=../certs/server.pem TLS_KEY=../certs/server-key.pem go run main.go
-
-## integration-clean: Clean up test containers and certificates
+## integration-clean: Clean up integration test artifacts
 integration-clean:
-	@docker compose -f testcontainer/docker-compose.yml down --rmi local --volumes 2>/dev/null || true
-	@rm -rf testcontainer/certs/
+	@$(MAKE) -C test/testcontainer clean
