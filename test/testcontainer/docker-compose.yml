@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # HTTPS test server - uses custom CA cert
+  testserver:
+    build:
+      context: ..
+      dockerfile: testcontainer/Dockerfile
+      target: server-builder
+      network: host
+    image: trustica-testserver
+    command: ["/testserver"]
+    volumes:
+      - ./certs:/certs:ro
+    environment:
+      - TLS_CERT=/certs/server.pem
+      - TLS_KEY=/certs/server-key.pem
+      - ADDR=:8443
+    ports:
+      - "8443:8443"
+    networks:
+      testnet:
+        aliases:
+          - testserver.local
+
+  # Test runner container - has all tools installed
+  testrunner:
+    build:
+      context: ..
+      dockerfile: testcontainer/Dockerfile
+      network: host
+    image: trustica-testrunner
+    depends_on:
+      - testserver
+    volumes:
+      - ./certs:/certs:ro
+      - ./scripts:/tests:ro
+    environment:
+      - TEST_SERVER_URL=https://testserver.local:8443
+      - CA_CERT_PATH=/certs/ca.pem
+    networks:
+      - testnet
+    # Add hosts entry since /etc/hosts can't be modified easily
+    extra_hosts:
+      - "testserver.local:testserver"
+
+networks:
+  testnet:
+    driver: bridge
