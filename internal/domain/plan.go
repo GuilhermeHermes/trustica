@@ -8,7 +8,9 @@ package domain
 // The Plan provides visibility into what Trustica will do before
 // it actually does it. This supports the "explicit over implicit" principle.
 //
-// Plan is a value object - immutable after creation.
+// Mutability: Plan is mutable during the Detect phase (via AddTarget/AddSkipped).
+// Once the Detect phase completes, the Plan should be treated as read-only.
+// This is a pragmatic choice for MVP - the builder pattern could be used later.
 type Plan struct {
 	// Targets are the environments that will be processed.
 	// These environments were detected and are applicable.

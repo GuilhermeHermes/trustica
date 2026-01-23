@@ -1,23 +1,11 @@
-// Package port defines the interfaces (contracts) that connect the Core to external systems.
-//
-// Ports are the boundaries of the hexagonal architecture:
-//   - Inbound ports: how external actors drive the Core (e.g., CLI)
-//   - Outbound ports: how the Core interacts with external systems (e.g., environments, filesystem)
-//
-// The Core depends on these interfaces, not on concrete implementations.
-// Adapters implement these interfaces with real or mock behavior.
-package port
+package domain
 
-import (
-	"context"
-
-	"github.com/GuilhermeHermes/trustica/internal/domain"
-)
+import "context"
 
 // EnvironmentAdapter defines the contract for environment-specific trust configuration.
 //
 // Each supported environment (OpenSSL, Python, Node.js, Git, etc.) implements this interface.
-// The Core treats all environments uniformly through this contract.
+// The Orchestrator treats all environments uniformly through this contract.
 //
 // Lifecycle:
 //  1. Info() - Identify the environment
@@ -32,7 +20,7 @@ import (
 type EnvironmentAdapter interface {
 	// Info returns the identity of this environment.
 	// This is a pure function with no side effects.
-	Info() domain.Environment
+	Info() Environment
 
 	// Detect checks whether this environment is present and configurable.
 	//
@@ -58,7 +46,7 @@ type EnvironmentAdapter interface {
 	//   - StateApplied: certificate was installed
 	//   - StateAlreadyTrusted: certificate was already present
 	//   - StateFailed: installation failed (check error)
-	Apply(ctx context.Context, cert domain.Certificate) (domain.State, error)
+	Apply(ctx context.Context, cert Certificate) (State, error)
 
 	// Verify confirms that TLS trust is working correctly.
 	//
