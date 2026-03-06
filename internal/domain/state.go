@@ -1,37 +1,36 @@
-
 package domain
 
 // State represents the lifecycle state of an environment during trust configuration.
 //
 // State transitions follow this flow:
 //
-//	                    ┌──────────────┐
-//	                    │ NotDetected  │ ──────────────────┐
-//	                    └──────────────┘                   │
-//	                           │                           │
-//	                     (if detected)                     │
-//	                           ▼                           ▼
-//	                    ┌──────────────┐            ┌──────────┐
-//	                    │   Detected   │            │  Skipped │
-//	                    └──────────────┘            └──────────┘
-//	                           │
-//	            ┌──────────────┼──────────────┐
-//	            │              │              │
-//	       (apply ok)    (already ok)    (error)
-//	            ▼              ▼              ▼
-//	     ┌──────────┐  ┌──────────────┐  ┌────────┐
-//	     │ Applied  │  │AlreadyTrusted│  │ Failed │
-//	     └──────────┘  └──────────────┘  └────────┘
-//	            │              │
-//	            └──────┬───────┘
-//	                   ▼
-//	              (verify)
-//	                   │
-//	          ┌────────┴────────┐
-//	          ▼                 ▼
-//	    ┌──────────┐      ┌────────┐
-//	    │ Verified │      │ Failed │
-//	    └──────────┘      └────────┘
+//	                ┌──────────────┐
+//	                │ NotDetected  │ ──────────────────┐
+//	                └──────────────┘                   │
+//	                       │                           │
+//	                 (if detected)                     │
+//	                       ▼                           ▼
+//	                ┌──────────────┐            ┌──────────┐
+//	                │   Detected   │            │  Skipped │
+//	                └──────────────┘            └──────────┘
+//	                       │
+//	        ┌──────────────┼──────────────┐
+//	        │              │              │
+//	   (apply ok)    (already ok)    (error)
+//	        ▼              ▼              ▼
+//	 ┌──────────┐  ┌──────────────┐  ┌────────┐
+//	 │ Applied  │  │AlreadyTrusted│  │ Failed │
+//	 └──────────┘  └──────────────┘  └────────┘
+//	        │              │
+//	        └──────┬───────┘
+//	               ▼
+//	          (verify)
+//	               │
+//	      ┌────────┴────────┐
+//	      ▼                 ▼
+//	┌──────────┐      ┌────────┐
+//	│ Verified │      │ Failed │
+//	└──────────┘      └────────┘
 //
 // State transitions are controlled exclusively by the Orchestrator (Core).
 // Adapters report outcomes; the Core decides state changes.
